@@ -57,29 +57,100 @@
   <div class="chatbox">
     <div class="avatar"></div>
     <div class="chat" id="chat-area">
-      <p>👋 Hi there! What’s your name?</p>
+      <p>👋 Hello there!</p>
+      <p>My name is Aby Senna, your personal tour guide for this session!</p>
+      <p>And to whom do I have the pleasure of speaking?</p>
       <input type="text" id="nameInput" placeholder="Enter your name">
       <button onclick="submitName()">Submit</button>
     </div>
   </div>
 
   <script>
+    let userName = '';
+
     function submitName() {
-      const name = document.getElementById('nameInput').value.trim();
+      userName = document.getElementById('nameInput').value.trim();
       const chat = document.getElementById('chat-area');
-      if (name === '') {
+      if (userName === '') {
         alert('Please enter your name.');
         return;
       }
-      chat.innerHTML = `<p>Nice to meet you, <strong>${name}</strong>! What brings you here today?</p>
-        <button class="choice-btn" onclick="redirect('visitor')">I'm a Visitor</button>
-        <button class="choice-btn" onclick="redirect('member')">I'm a Member</button>
-        <button class="choice-btn" onclick="redirect('event')">Register for The Big Catch Baptism</button>`;
+      chat.innerHTML = `<p>Well hello, <strong>${userName}</strong>! Welcome to The Ab! What brings you by today?</p>
+        <button class="choice-btn" onclick="visitorIntro()">I am a Visitor</button>
+        <button class="choice-btn" onclick="redirect('member')">I am a Member</button>
+        <button class="choice-btn" onclick="redirect('event')">I am Registering for an Event</button>`;
+    }
+
+    function visitorIntro() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>We are so happy to have you with us today, ${userName}!</p>
+        <p>Did one of our members invite you to join us today, or did you just happen to stop by?</p>
+        <button class="choice-btn" onclick="invited(true)">I was invited</button>
+        <button class="choice-btn" onclick="invited(false)">I came on my own</button>`;
+    }
+
+    function invited(byMember) {
+      const chat = document.getElementById('chat-area');
+      let msg = byMember ? "We’ll be sure to thank them for inviting you!" : "We’re so glad you chose to worship with us today!";
+      chat.innerHTML = `<p>${msg}</p>
+        <p>Is this your first time here?</p>
+        <button class="choice-btn" onclick="firstTime(true)">Yes</button>
+        <button class="choice-btn" onclick="firstTime(false)">No</button>`;
+    }
+
+    function firstTime(isFirst) {
+      const chat = document.getElementById('chat-area');
+      let msg = isFirst ? "We’re going to do everything we can to make sure it’s not your last!" : "Welcome back! Hopefully we’re starting to feel more like family!";
+      chat.innerHTML = `<p>${msg}</p>
+        <p>Make sure you stop by the Visitor’s Center and pick up your Welcome Gift!</p>
+        <p>${userName}, do you know Jesus Christ?</p>
+        <button class="choice-btn" onclick="knowsJesus(true)">Yes</button>
+        <button class="choice-btn" onclick="knowsJesus(false)">No</button>`;
+    }
+
+    function knowsJesus(doesKnow) {
+      const chat = document.getElementById('chat-area');
+      if (doesKnow) {
+        chat.innerHTML = `<p>That’s the BEST NEWS EVER!</p>
+          <p>Again, welcome to Abyssinia, ${userName}!</p>
+          <p>Take a look around our site, and stop any one of us to ask any questions you have! We hope you enjoy your visit and can’t wait to see you again!!</p>`;
+      } else {
+        chat.innerHTML = `<p>No problem! I’m happy to tell you all about Him!</p>
+          <p>God is Holy, and sin cannot stand in His presence... (message truncated for brevity)</p>
+          <p>Have you accepted Him as your Lord and Savior?</p>
+          <button class="choice-btn" onclick="acceptedJesus(true)">Yes</button>
+          <button class="choice-btn" onclick="acceptedJesus(false)">No</button>`;
+      }
+    }
+
+    function acceptedJesus(hasAccepted) {
+      const chat = document.getElementById('chat-area');
+      if (hasAccepted) {
+        chat.innerHTML = `<p>That’s the BEST NEWS EVER!</p>
+          <p>Again, welcome to Abyssinia, ${userName}!</p>
+          <p>We hope you enjoy your visit and come back soon!</p>`;
+      } else {
+        chat.innerHTML = `<p>Are you ready to accept Him as Savior today?</p>
+          <button class="choice-btn" onclick="readyToAccept(true)">Yes</button>
+          <button class="choice-btn" onclick="readyToAccept(false)">No</button>`;
+      }
+    }
+
+    function readyToAccept(isReady) {
+      const chat = document.getElementById('chat-area');
+      if (isReady) {
+        chat.innerHTML = `<p>It’s as easy as ABC: Acknowledge our sinfulness, Believe that Jesus is the Son of God, and Confess Him as Lord and Savior.</p>
+          <p>Pray this prayer right now:</p>
+          <p><em>"Lord Jesus, I know I am a sinner. I believe you died on the cross for my sins and rose again. I turn from my sins and ask you to come into my heart and be my Lord and Savior. Thank you for your forgiveness and new life. Amen."</em></p>
+          <p>Welcome to the family, ${userName}!</p>`;
+      } else {
+        chat.innerHTML = `<p>I respect your decision and won’t push, but know that the entire Abyssinia family will continue to pray with and for your salvation!</p>
+          <p>Again, welcome to The Ab, ${userName}!</p>`;
+      }
     }
 
     function redirect(choice) {
       const urls = {
-        visitor: 'https://abyssinia.org/theab/im-new/',
         member: 'https://abyssinia.org/theab/',
         event: 'https://www.eventbrite.com/e/the-big-catch-baptism-family-friends-and-community-day-tickets-1422315657419?aff=ebdssbdestsearch'
       };
