@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to The AB</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    .chatbox {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-image: url('Aby Senna.png');
+      background-size: cover;
+      background-position: center;
+      margin: 0 auto 10px;
+    }
+    .chat {
+      margin: 15px 0;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      width: 80%;
+      font-size: 16px;
+    }
+    .choice-btn {
+      width: 90%;
+      margin: 10px auto;
+      display: block;
+      font-weight: bold;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .choice-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="chatbox">
+    <div class="avatar"></div>
+    <div class="chat" id="chat-area">
+      <p>👋 Hi there! What’s your name?</p>
+      <input type="text" id="nameInput" placeholder="Enter your name">
+      <button onclick="submitName()">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    function submitName() {
+      const name = document.getElementById('nameInput').value.trim();
+      const chat = document.getElementById('chat-area');
+      if (name === '') {
+        alert('Please enter your name.');
+        return;
+      }
+      chat.innerHTML = `<p>Nice to meet you, <strong>${name}</strong>! What brings you here today?</p>
+        <button class="choice-btn" onclick="redirect('visitor')">I'm a Visitor</button>
+        <button class="choice-btn" onclick="redirect('member')">I'm a Member</button>
+        <button class="choice-btn" onclick="redirect('event')">Register for The Big Catch Baptism</button>`;
+    }
+
+    function redirect(choice) {
+      const urls = {
+        visitor: 'https://abyssinia.org/theab/im-new/',
+        member: 'https://abyssinia.org/theab/',
+        event: 'https://www.eventbrite.com/e/the-big-catch-baptism-family-friends-and-community-day-tickets-1422315657419?aff=ebdssbdestsearch'
+      };
+      window.location.href = urls[choice];
+    }
+  </script>
+</body>
+</html>
