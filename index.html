@@ -20,8 +20,8 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .avatar {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       background-image: url('Aby Senna.png');
       background-size: cover;
@@ -57,43 +57,69 @@
   <div class="chatbox">
     <div class="avatar"></div>
     <div class="chat" id="chat-area">
-      <p>👋 Hello there!</p>
-      <p>My name is Aby Senna, your personal tour guide for this session!</p>
-      <p>And to whom do I have the pleasure of speaking?</p>
-      <input type="text" id="nameInput" placeholder="Enter your name">
-      <button onclick="submitName()">Submit</button>
+      <p>👋 Hi there! My name is Aby Senna, your personal tour guide.</p>
+      <button onclick="askName()">Continue</button>
     </div>
   </div>
 
   <script>
     let userName = '';
+    let inviterName = '';
+
+    function askName() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>And to whom do I have the pleasure of speaking?</p>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button onclick="submitName()">Submit</button>`;
+    }
 
     function submitName() {
       userName = document.getElementById('nameInput').value.trim();
+      if (!userName) return alert("Please enter your name.");
       const chat = document.getElementById('chat-area');
-      if (userName === '') {
-        alert('Please enter your name.');
-        return;
-      }
-      chat.innerHTML = `<p>Well hello, <strong>${userName}</strong>! Welcome to The Ab! What brings you by today?</p>
+      chat.innerHTML = `<p>Well hello, <strong>${userName}</strong>! Welcome to The Ab.</p>
+        <button onclick="askPurpose()">Continue</button>`;
+    }
+
+    function askPurpose() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Tell me, ${userName}, what brings you by today?</p>
         <button class="choice-btn" onclick="visitorIntro()">I am a Visitor</button>
-        <button class="choice-btn" onclick="redirect('member')">I am a Member</button>
+        <button class="choice-btn" onclick="memberIntro()">I am a Member</button>
         <button class="choice-btn" onclick="redirect('event')">I am Registering for an Event</button>`;
     }
 
     function visitorIntro() {
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `<p>We are so happy to have you with us today, ${userName}!</p>
-        <p>Did one of our members invite you to join us today, or did you just happen to stop by?</p>
-        <button class="choice-btn" onclick="invited(true)">I was invited</button>
-        <button class="choice-btn" onclick="invited(false)">I came on my own</button>`;
+        <button onclick="askInvited()">Continue</button>`;
     }
 
-    function invited(byMember) {
+    function askInvited() {
       const chat = document.getElementById('chat-area');
-      let msg = byMember ? "We’ll be sure to thank them for inviting you!" : "We’re so glad you chose to worship with us today!";
-      chat.innerHTML = `<p>${msg}</p>
-        <p>Is this your first time here?</p>
+      chat.innerHTML = `<p>Did one of our members invite you to join us today, or did you just happen to stop by?</p>
+        <button class="choice-btn" onclick="askInviterName()">I was Invited</button>
+        <button class="choice-btn" onclick="askFirstTime()">I came on my own</button>`;
+    }
+
+    function askInviterName() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Terrific! Please tell me who invited you today:</p>
+        <input type="text" id="inviterInput" placeholder="Enter their name">
+        <button onclick="submitInviterName()">Submit</button>`;
+    }
+
+    function submitInviterName() {
+      inviterName = document.getElementById('inviterInput').value.trim();
+      if (!inviterName) return alert("Please enter the name of the inviter.");
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Perfect! I’ll be sure to let <strong>${inviterName}</strong> know we spoke and thank them for introducing us!</p>
+        <button onclick="askFirstTime()">Continue</button>`;
+    }
+
+    function askFirstTime() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Is this your first time here?</p>
         <button class="choice-btn" onclick="firstTime(true)">Yes</button>
         <button class="choice-btn" onclick="firstTime(false)">No</button>`;
     }
@@ -102,8 +128,13 @@
       const chat = document.getElementById('chat-area');
       let msg = isFirst ? "We’re going to do everything we can to make sure it’s not your last!" : "Welcome back! Hopefully we’re starting to feel more like family!";
       chat.innerHTML = `<p>${msg}</p>
-        <p>Make sure you stop by the Visitor’s Center and pick up your Welcome Gift!</p>
-        <p>${userName}, do you know Jesus Christ?</p>
+        <p>Make sure to stop by the Visitor’s Center and pick up your Welcome Gift!</p>
+        <button onclick="askAboutJesus()">Continue</button>`;
+    }
+
+    function askAboutJesus() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>${userName}, do you know Jesus Christ?</p>
         <button class="choice-btn" onclick="knowsJesus(true)">Yes</button>
         <button class="choice-btn" onclick="knowsJesus(false)">No</button>`;
     }
@@ -113,14 +144,24 @@
       if (doesKnow) {
         chat.innerHTML = `<p>That’s the BEST NEWS EVER!</p>
           <p>Again, welcome to Abyssinia, ${userName}!</p>
-          <p>Take a look around our site, and stop any one of us to ask any questions you have! We hope you enjoy your visit and can’t wait to see you again!!</p>`;
+          <p>We hope you enjoy your visit and come back soon!</p>`;
       } else {
-        chat.innerHTML = `<p>No problem! I’m happy to tell you all about Him!</p>
-          <p>God is Holy, and sin cannot stand in His presence... (message truncated for brevity)</p>
-          <p>Have you accepted Him as your Lord and Savior?</p>
-          <button class="choice-btn" onclick="acceptedJesus(true)">Yes</button>
-          <button class="choice-btn" onclick="acceptedJesus(false)">No</button>`;
+        chat.innerHTML = `<p>No problem, ${userName}! I’m happy to tell you all about Him.</p>
+          <button onclick="showGospel()">Continue</button>`;
       }
+    }
+
+    function showGospel() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>God is Holy, and sin cannot stand in His presence. But just as we love our own children, even when they misbehave and disobey us, God still loves us and desires for us to come back to Him. But the penalty for sin is death and someone must pay. So out of love for us, God sent His only son, Jesus down into the world to pay that price and take on our punishment. Now that the sin debt has been paid, we have a clear path back to the open arms of God, through the crucifixion and burial sacrifice of Jesus Christ. But because Jesus is the Son of God, death couldn’t possibly keep Him. He rose from the grave and ascended back to Heaven, where He sits today.</p>
+        <button onclick="askSalvation()">Continue</button>`;
+    }
+
+    function askSalvation() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Have you accepted Him as your Lord and Savior?</p>
+        <button class="choice-btn" onclick="acceptedJesus(true)">Yes</button>
+        <button class="choice-btn" onclick="acceptedJesus(false)">No</button>`;
     }
 
     function acceptedJesus(hasAccepted) {
@@ -149,9 +190,31 @@
       }
     }
 
+    function memberIntro() {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Thank you for being a part of our church family, ${userName}!</p>
+        <p>What can I help you with today?</p>
+        <button class="choice-btn" onclick="memberHelp('ministry')">I want to join a ministry</button>
+        <button class="choice-btn" onclick="memberHelp('times')">I want to find service times</button>
+        <button class="choice-btn" onclick="memberHelp('contact')">I’d like someone to contact me</button>`;
+    }
+
+    function memberHelp(option) {
+      const chat = document.getElementById('chat-area');
+      let response = '';
+      if (option === 'ministry') {
+        response = `That’s wonderful, ${userName}! Please visit <a href='https://abyssinia.org/theab/ministries/' target='_blank'>our Ministries page</a> to learn more and sign up.`;
+      } else if (option === 'times') {
+        response = `You can find all of our service times right here: <a href='https://abyssinia.org/theab/service-times/' target='_blank'>Service Times</a>. We’d love to see you!`;
+      } else if (option === 'contact') {
+        response = `We’d be happy to connect with you, ${userName}. Please fill out <a href='https://abyssinia.org/theab/contact/' target='_blank'>this short form</a> and someone will be in touch very soon.`;
+      }
+      chat.innerHTML = `<p>${response}</p>
+        <p>Let us know if there’s anything else we can do for you!</p>`;
+    }
+
     function redirect(choice) {
       const urls = {
-        member: 'https://abyssinia.org/theab/',
         event: 'https://www.eventbrite.com/e/the-big-catch-baptism-family-friends-and-community-day-tickets-1422315657419?aff=ebdssbdestsearch'
       };
       window.location.href = urls[choice];
