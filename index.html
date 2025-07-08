@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to The AB</title>
+  <title>Visitor Registration - The AB</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,7 +23,6 @@
       width: 500px;
       height: 500px;
       border-radius: 50%;
-      background-image: url('Aby Senna.png');
       background-size: cover;
       background-position: center;
       margin: 0 auto 35px;
@@ -31,7 +30,7 @@
     .chat {
       margin: 15px 0;
     }
-    input, button {
+    input, button, select {
       padding: 10px;
       margin: 5px;
       width: 80%;
@@ -67,6 +66,12 @@
     .end-btn:hover {
       background-color: #222;
     }
+    img.frame-image {
+      max-width: 90%;
+      height: auto;
+      margin: 20px auto;
+      display: block;
+    }
     @media (max-width: 550px) {
       .avatar {
         width: 90vw;
@@ -84,231 +89,403 @@
       }
     }
   </style>
+  <!-- EmailJS library -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 </head>
 <body>
   <div class="chatbox">
-    <div class="avatar"></div>
+    <div class="avatar" id="avatar"></div>
     <div class="chat" id="chat-area">
       <p>👋 Hi there! My name is Aby Senna, your personal tour guide.</p>
-      <button onclick="askName()">Continue</button>
+      <button onclick="visitorWelcome()">Continue</button>
     </div>
   </div>
 
   <script>
-    let userName = '';
-    let inviterName = '';
+    // ---- EmailJS Config ----
+    const EMAILJS_SERVICE_ID = "service_6pibt1b";
+    const EMAILJS_TEMPLATE_ID = "template_pdukqjb";
+    const EMAILJS_USER_ID = "B5kliNA3CRAPTZtRL";
 
-    // Avatar updater
+    // ---- Data capture variables ----
+    let visitor = {
+      date_of_visit: new Date().toLocaleDateString(),
+      first_name: "",
+      full_name: "",
+      phone_number: "",
+      sms_permission: "",
+      email_address: "",
+      mailing_address: "",
+      visitor_type: "",     // "New" or "Repeat"
+      invited_by: "",
+      church_home: ""
+    };
+
+    // ---- Avatar Helper ----
     function setAvatar(imgName) {
-      const avatar = document.querySelector('.avatar');
-      avatar.style.backgroundImage = `url('${imgName}')`;
+      document.getElementById('avatar').style.backgroundImage = `url('${imgName}')`;
     }
 
-    // Frame 1: Ask for user name (for both visitor & member)
-    function askName() {
+    // ---- VISITOR JOURNEY ----
+
+    // Welcome
+    function visitorWelcome() {
       setAvatar('Aby - Hello.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>And to whom do I have the pleasure of speaking?</p>
-        <input type="text" id="nameInput" placeholder="Enter your name">
-        <button onclick="submitName()">Submit</button>`;
-    }
-
-    // Name submit handler (goes to purpose menu)
-    function submitName() {
-      userName = document.getElementById('nameInput').value.trim();
-      if (!userName) return alert("Please enter your name.");
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Well hello, <strong>${userName}</strong>! Welcome to The Ab.</p>
-        <button onclick="askPurpose()">Continue</button>`;
-    }
-
-    // Main menu (visitor/member/event)
-    function askPurpose() {
-      setAvatar('Aby - Hello.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Tell me, ${userName}, what brings you by today?</p>
-        <button class="choice-btn" onclick="visitorIntro()">I am a Visitor</button>
-        <button class="choice-btn" onclick="memberIntro()">I am a Member</button>
-        <button class="choice-btn" onclick="redirect('event')">I am Registering for an Event</button>`;
-    }
-
-    // VISITOR FLOW (unchanged)
-    function visitorIntro() {
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>We are so happy to have you with us today, ${userName}!</p>
-        <button onclick="askInvited()">Continue</button>`;
-    }
-
-    function askInvited() {
-      setAvatar('Aby - Question.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Did one of our members invite you to join us today, or did you just happen to stop by?</p>
-        <button class="choice-btn" onclick="askInviterName()">I was Invited</button>
-        <button class="choice-btn" onclick="askFirstTime()">I came on my own</button>`;
-    }
-
-    function askInviterName() {
-      setAvatar('Aby - Hello.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Terrific! Please tell me who invited you today:</p>
-        <input type="text" id="inviterInput" placeholder="Enter their name">
-        <button onclick="submitInviterName()">Submit</button>`;
-    }
-
-    function submitInviterName() {
-      inviterName = document.getElementById('inviterInput').value.trim();
-      if (!inviterName) return alert("Please enter the name of the inviter.");
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Perfect! I’ll be sure to let <strong>${inviterName}</strong> know we spoke and thank them for introducing us!</p>
-        <button onclick="askFirstTime()">Continue</button>`;
-    }
-
-    function askFirstTime() {
-      setAvatar('Aby - Question.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Is this your first time here?</p>
-        <button class="choice-btn" onclick="firstTime(true)">Yes</button>
-        <button class="choice-btn" onclick="firstTime(false)">No</button>`;
-    }
-
-    function firstTime(isFirst) {
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      let msg = isFirst ? "We’re going to do everything we can to make sure it’s not your last!" : "Welcome back! Hopefully we’re starting to feel more like family!";
-      chat.innerHTML = `<p>${msg}</p>
-        <p>Make sure to stop by the Visitor’s Center and pick up your Welcome Gift!</p>
-        <button onclick="askAboutJesus()">Continue</button>`;
-    }
-
-    function askAboutJesus() {
-      setAvatar('Aby - Question.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>${userName}, do you know Jesus Christ?</p>
-        <button class="choice-btn" onclick="knowsJesus(true)">Yes</button>
-        <button class="choice-btn" onclick="knowsJesus(false)">No</button>`;
-    }
-
-    function knowsJesus(doesKnow) {
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      if (doesKnow) {
-        chat.innerHTML = `<p>That’s the BEST NEWS EVER!</p>
-          <p>Again, welcome to Abyssinia, ${userName}!</p>
-          <p>We hope you enjoy your visit and come back soon!</p>`;
-      } else {
-        chat.innerHTML = `<p>No problem, ${userName}! I’m happy to tell you all about Him.</p>
-          <button onclick="showGospel()">Continue</button>`;
-      }
-    }
-
-    function showGospel() {
-      setAvatar('Aby - Serious.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>God is Holy, and sin cannot stand in His presence. But just as we love our own children, even when they misbehave and disobey us, God still loves us and desires for us to come back to Him. But the penalty for sin is death and someone must pay. So out of love for us, God sent His only son, Jesus down into the world to pay that price and take on our punishment. Now that the sin debt has been paid, we have a clear path back to the open arms of God, through the crucifixion and burial sacrifice of Jesus Christ. But because Jesus is the Son of God, death couldn’t possibly keep Him. He rose from the grave and ascended back to Heaven, where He sits today.</p>
-        <button onclick="askSalvation()">Continue</button>`;
-    }
-
-    function askSalvation() {
-      setAvatar('Aby - Question.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Have you accepted Him as your Lord and Savior?</p>
-        <button class="choice-btn" onclick="acceptedJesus(true)">Yes</button>
-        <button class="choice-btn" onclick="acceptedJesus(false)">No</button>`;
-    }
-
-    function acceptedJesus(hasAccepted) {
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      if (hasAccepted) {
-        chat.innerHTML = `<p>That’s the BEST NEWS EVER!</p>
-          <p>Again, welcome to Abyssinia, ${userName}!</p>
-          <p>We hope you enjoy your visit and come back soon!</p>`;
-      } else {
-        chat.innerHTML = `<p>Are you ready to accept Him as Savior today?</p>
-          <button class="choice-btn" onclick="readyToAccept(true)">Yes</button>
-          <button class="choice-btn" onclick="readyToAccept(false)">No</button>`;
-      }
-    }
-
-    function readyToAccept(isReady) {
-      setAvatar('Aby - Serious.png');
-      const chat = document.getElementById('chat-area');
-      if (isReady) {
-        chat.innerHTML = `<p>It’s as easy as ABC: Acknowledge our sinfulness, Believe that Jesus is the Son of God, and Confess Him as Lord and Savior.</p>
-          <p>Pray this prayer right now:</p>
-          <p><em>"Lord Jesus, I know I am a sinner. I believe you died on the cross for my sins and rose again. I turn from my sins and ask you to come into my heart and be my Lord and Savior. Thank you for your forgiveness and new life. Amen."</em></p>
-          <p>Welcome to the family, ${userName}!</p>`;
-      } else {
-        chat.innerHTML = `<p>I respect your decision and won’t push, but know that the entire Abyssinia family will continue to pray with and for your salvation!</p>
-          <p>Again, welcome to The Ab, ${userName}!</p>`;
-      }
-    }
-
-    // ============ MEMBER FLOW ============
-
-    // Member Flow Frame 2: Thank by name (enters directly after purpose select)
-    function memberIntro() {
-      setAvatar('Aby - Excited.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>Thank you, <strong>${userName}</strong>, for being a vital part of The Abyssinia Church Family.</p>
-        <button onclick="memberReason()">Continue</button>`;
-    }
-
-    // Member Flow Frame 3: Ask purpose w/ avatar
-    function memberReason() {
-      setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <p>So, <strong>${userName}</strong>, how can I help you today?</p>
-        <button class="choice-btn" onclick="memberHelp('ride')">I need to schedule a ride</button>
-        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/join-a-ministry/', '_blank')">How can I join a Ministry?</button>
-        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/prayer-request/', '_blank')">I'm in need of Prayer</button>
-        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/counseling-request/', '_blank')">I'm in need of Counseling</button>
-        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/online-giving/', '_blank')">I want to give online</button>
+        <p>Welcome to The Ab! We're so glad you're here.</p>
+        <p>What's your first name?</p>
+        <input type="text" id="visitorFirstName" placeholder="First name">
+        <button onclick="visitorFirstNameSubmit()">Continue</button>
       `;
     }
 
-    // Member Branching and looping
-    function memberHelp(option) {
-      let response = '';
-      setAvatar('Aby - Serious.png');
-      if (option === 'ride') {
-        response = `If you need transportation to any of our regularly scheduled services, please call the church at: <a href="tel:9046961770">(904) 696-1770</a> and leave a message for the transportation ministry. We’ll be happy to pick you up and take you home safely!`;
-        showAnythingElse(response);
-      }
-      // All other options are now handled by direct redirect in memberReason()
+    function visitorFirstNameSubmit() {
+      const name = document.getElementById('visitorFirstName').value.trim();
+      visitor.first_name = name;
+      if (!name) return alert("Please enter your first name.");
+      visitorType();
     }
 
-    // "Is there anything else?" frame and logic
-    function showAnythingElse(prevResponse) {
+    // New or Repeat
+    function visitorType() {
+      setAvatar('Aby - Excited.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <p>${prevResponse}</p>
-        <p>Is there anything else I can help you with?</p>
-        <button class="choice-btn" onclick="memberReason()">Yes</button>
-        <button class="choice-btn" onclick="goodbyeMember()">No</button>
+        <p>Hi, <strong>${visitor.first_name}</strong>! Is this your first time visiting The Ab, or are you a returning guest?</p>
+        <button class="choice-btn" onclick="visitorTypeSelect('New')">First time visitor</button>
+        <button class="choice-btn" onclick="visitorTypeSelect('Repeat')">I've visited before</button>
       `;
     }
 
-    // Goodbye frame with "End" button to website
-    function goodbyeMember() {
+    function visitorTypeSelect(type) {
+      visitor.visitor_type = type;
+      setAvatar('Aby - Hello.png');
+      const chat = document.getElementById('chat-area');
+      if (type === 'New') {
+        chat.innerHTML = `
+          <p>We're excited to meet you, ${visitor.first_name}! We'll do everything we can to make sure this isn't your last visit.</p>
+          <button onclick="visitorInvited()">Continue</button>
+        `;
+      } else {
+        chat.innerHTML = `
+          <p>Welcome back, ${visitor.first_name}! You're becoming just like family.</p>
+          <button onclick="visitorInvited()">Continue</button>
+        `;
+      }
+    }
+
+    // Invited or came alone
+    function visitorInvited() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Did someone invite you today, or did you come on your own?</p>
+        <button class="choice-btn" onclick="visitorInvitedBy()">I was invited</button>
+        <button class="choice-btn" onclick="visitorRepeatName()">I came on my own</button>
+      `;
+    }
+
+    function visitorInvitedBy() {
+      setAvatar('Aby - Listening.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Who invited you?</p>
+        <input type="text" id="invitedByInput" placeholder="Enter member's name">
+        <button onclick="visitorInvitedNameSubmit()">Continue</button>
+      `;
+    }
+
+    function visitorInvitedNameSubmit() {
+      const inviter = document.getElementById('invitedByInput').value.trim();
+      visitor.invited_by = inviter;
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Thank you! We'll be sure to let <strong>${inviter}</strong> know that you stopped by, and thank them for sharing the good news!</p>
+        <button onclick="visitorRepeatName()">Continue</button>
+      `;
+    }
+
+    // Ask for full name (frame shows previous name)
+    function visitorRepeatName() {
+      setAvatar('Aby - Hello.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Just to make sure our records are correct, your first name is: <strong>${visitor.first_name}</strong></p>
+        <p>Would you please retype your full name (first and last)?</p>
+        <input type="text" id="visitorFullName" placeholder="Full Name">
+        <button onclick="visitorFullNameSubmit()">Continue</button>
+      `;
+    }
+
+    function visitorFullNameSubmit() {
+      visitor.full_name = document.getElementById('visitorFullName').value.trim();
+      visitorPhone();
+    }
+
+    // Phone and Home/Cell
+    function visitorPhone() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>What is your telephone number?</p>
+        <input type="text" id="visitorPhoneInput" placeholder="Phone Number">
+        <select id="phoneTypeSelect">
+          <option value="cell">Cell Phone</option>
+          <option value="home">Home Phone</option>
+        </select>
+        <button onclick="visitorPhoneType()">Continue</button>
+      `;
+    }
+
+    function visitorPhoneType() {
+      visitor.phone_number = document.getElementById('visitorPhoneInput').value.trim();
+      const type = document.getElementById('phoneTypeSelect').value;
+      if (type === "cell") {
+        visitor.phone_type = "Cell";
+        visitorAskSMS();
+      } else {
+        visitor.phone_type = "Home";
+        visitor.sms_permission = "No";
+        visitorEmail();
+      }
+    }
+
+    function visitorAskSMS() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Do we have your permission to send you occasional text messages? We promise not to spam you!</p>
+        <button class="choice-btn" onclick="visitorSMSPermission('Yes')">Yes, you can text me</button>
+        <button class="choice-btn" onclick="visitorSMSPermission('No')">No, please do not text</button>
+      `;
+    }
+
+    function visitorSMSPermission(val) {
+      visitor.sms_permission = val;
+      visitorEmail();
+    }
+
+    // Email and Mailing Address
+    function visitorEmail() {
+      setAvatar('Aby - Listening.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>What is your email address?</p>
+        <input type="email" id="visitorEmailInput" placeholder="Email Address">
+        <button onclick="visitorEmailSubmit()">Continue</button>
+      `;
+    }
+
+    function visitorEmailSubmit() {
+      visitor.email_address = document.getElementById('visitorEmailInput').value.trim();
+      visitorAddress();
+    }
+
+    function visitorAddress() {
+      setAvatar('Aby - Listening.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>What is your mailing address?</p>
+        <input type="text" id="visitorAddressInput" placeholder="Mailing Address">
+        <button onclick="visitorAddressSubmit()">Continue</button>
+      `;
+    }
+
+    function visitorAddressSubmit() {
+      visitor.mailing_address = document.getElementById('visitorAddressInput').value.trim();
+      visitorChurchHome();
+    }
+
+    // Church home
+    function visitorChurchHome() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Do you currently have a church home?</p>
+        <button class="choice-btn" onclick="visitorChurchHomeYes()">Yes</button>
+        <button class="choice-btn" onclick="visitorChurchHomeNo()">No</button>
+      `;
+    }
+
+    function visitorChurchHomeYes() {
+      setAvatar('Aby - Hello.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>What is the name of your church home?</p>
+        <input type="text" id="visitorChurchHomeInput" placeholder="Church Name">
+        <button onclick="visitorChurchHomeNameSubmit()">Continue</button>
+      `;
+    }
+
+    function visitorChurchHomeNameSubmit() {
+      visitor.church_home = document.getElementById('visitorChurchHomeInput').value.trim();
+      sendVisitorEmail();
+    }
+
+    function visitorChurchHomeNo() {
+      visitor.church_home = "None";
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>We have an amazing church family with Life-Cycle ministries for all ages. Dr. Eugene W. Diamond is the greatest pastor on this side of heaven, and he would absolutely love to be your pastor. We would love to embrace you into our family!</p>
+        <button onclick="sendVisitorEmail()">Continue</button>
+      `;
+    }
+
+    // ---- EMAIL SENDING LOGIC ----
+    function sendVisitorEmail() {
+      setAvatar('Aby - Listening.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Registering your information...</p>`;
+      // Prepare EmailJS params
+      emailjs.init(EMAILJS_USER_ID);
+      const params = {
+        date_of_visit: visitor.date_of_visit,
+        full_name: visitor.full_name,
+        email_address: visitor.email_address,
+        mailing_address: visitor.mailing_address,
+        phone_number: visitor.phone_number,
+        sms_permission: visitor.sms_permission,
+        visitor_type: visitor.visitor_type,
+        invited_by: visitor.invited_by,
+        church_home: visitor.church_home
+      };
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, params)
+        .then(function(response) {
+          visitorEmailSent();
+        }, function(error) {
+          chat.innerHTML = `<p>Sorry, we couldn't send your registration information. Please try again or let the Welcome Center know.</p>
+            <button onclick="visitorEmailSent()">Continue</button>
+          `;
+        });
+    }
+
+    function visitorEmailSent() {
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Thank you for sharing your information, <strong>${visitor.first_name}</strong>!</p>
+        <button onclick="visitorFaithJourney()">Continue</button>
+      `;
+    }
+
+    // ---- FAITH CONVERSATION ----
+
+    // Know Jesus?
+    function visitorFaithJourney() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Do you know the Lord Jesus Christ?</p>
+        <button class="choice-btn" onclick="visitorFaithYes()">Yes</button>
+        <button class="choice-btn" onclick="visitorFaithNo()">No</button>
+      `;
+    }
+
+    function visitorFaithYes() {
+      visitorAcceptedJesus();
+    }
+
+    function visitorFaithNo() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Would you like to know more about Him?</p>
+        <button class="choice-btn" onclick="visitorGospel()">Yes</button>
+        <button class="choice-btn" onclick="visitorWelcomeGift()">No</button>
+      `;
+    }
+
+    function visitorGospel() {
+      setAvatar('Aby - Praying.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Jesus Christ is God's Son, sent to show us how much God loves us. He lived a perfect, loving life and taught people how to love God and each other. Jesus gave His life for us by dying on the cross to take away our sins. All the wrong things we've ever done or will do, Jesus has covered with his blood sacrifice on the cross. After He died and was buried, Jesus came back to life. Anyone who believes in Him can have eternal life with God.</p>
+        <button onclick="visitorHowToBeSaved()">Continue</button>
+      `;
+    }
+
+    function visitorHowToBeSaved() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Would you like to know how to be saved and forgiven?</p>
+        <button class="choice-btn" onclick="visitorShowABCs()">Yes</button>
+        <button class="choice-btn" onclick="visitorWelcomeGift()">No</button>
+      `;
+    }
+
+    function visitorShowABCs() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <img src="ABCs – Salvation.png" class="frame-image" alt="ABCs of Salvation">
+        <button onclick="visitorReadyToAccept()">Continue</button>
+      `;
+    }
+
+    function visitorReadyToAccept() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Are you ready to accept Christ today?</p>
+        <button class="choice-btn" onclick="visitorPrayerOfSalvation()">Yes</button>
+        <button class="choice-btn" onclick="visitorWelcomeGift()">No</button>
+      `;
+    }
+
+    function visitorPrayerOfSalvation() {
+      setAvatar('Aby - Praying.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <img src="Prayer of Salvation.png" class="frame-image" alt="Prayer of Salvation">
+        <button onclick="visitorCongratulations()">Continue</button>
+      `;
+    }
+
+    function visitorAcceptedJesus() {
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Have you accepted Jesus as your personal Savior?</p>
+        <button class="choice-btn" onclick="visitorCongratulations()">Yes</button>
+        <button class="choice-btn" onclick="visitorReadyToAccept()">No</button>
+      `;
+    }
+
+    function visitorCongratulations() {
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Welcome to the Body of Christ and to the family of Believers!</p>
+        <p>According to Mark 16:16, baptism is an outward expression of an inward confession.</p>
+        <p>It's very important to get connected to a Bible-based church as soon as possible, where you can grow in your new faith—even if it's not Abyssinia.</p>
+        <p>We have an amazing church family with Life-Cycle ministries for all, and Dr. Eugene W. Diamond is the greatest pastor on this side of heaven! He would absolutely love to be your pastor, and we would love to embrace you into the family.</p>
+        <button onclick="visitorWelcomeGift()">Continue</button>
+      `;
+    }
+
+    // Welcome Gift/Final Thank You
+    function visitorWelcomeGift() {
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Please stop by the Welcome Center before or after service to receive your special gift!</p>
+        <button onclick="visitorGoodbye()">Continue</button>
+      `;
+    }
+
+    // Goodbye Page with End/Request Prayer
+    function visitorGoodbye() {
       setAvatar('Aby - Goodbye.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <p>Come see me again soon! Have a great day!</p>
+        <p>Thank you for visiting with us! We can't wait to see you again.</p>
         <button class="end-btn" onclick="window.location.href='https://abyssinia.org/theab/'">End</button>
+        <button class="end-btn" onclick="window.location.href='https://abyssinia.org/theab/prayer-request/'">Request Prayer</button>
       `;
-    }
-
-    // EVENT redirect (from main menu)
-    function redirect(choice) {
-      const urls = {
-        event: 'https://www.eventbrite.com/e/the-big-catch-baptism-family-friends-and-community-day-tickets-1422315657419?aff=ebdssbdestsearch'
-      };
-      window.location.href = urls[choice];
     }
   </script>
 </body>
