@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visitor Registration - The AB</title>
+  <title>Welcome to The AB</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
       width: 500px;
       height: 500px;
       border-radius: 50%;
-      background-image: URL('Aby - Hello.png');
+      background-image: url('Aby - Question.png');
       background-size: cover;
       background-position: center;
       margin: 0 auto 35px;
@@ -98,7 +98,7 @@
     <div class="avatar" id="avatar"></div>
     <div class="chat" id="chat-area">
       <p>👋 Hi there! My name is Aby Senna, your personal tour guide.</p>
-      <button onclick="visitorWelcome()">Continue</button>
+      <button onclick="askName()">Continue</button>
     </div>
   </div>
 
@@ -108,7 +108,7 @@
     const EMAILJS_TEMPLATE_ID = "template_pdukqjb";
     const EMAILJS_USER_ID = "B5kliNA3CRAPTZtRL";
 
-    // ---- Data capture variables ----
+    // ---- Data capture variables for Visitor ----
     let visitor = {
       date_of_visit: new Date().toLocaleDateString(),
       first_name: "",
@@ -122,38 +122,63 @@
       church_home: ""
     };
 
+    // Store the user's name for all flows
+    let userName = '';
+    let inviterName = '';
+
     // ---- Avatar Helper ----
     function setAvatar(imgName) {
       document.getElementById('avatar').style.backgroundImage = `url('${imgName}')`;
     }
 
-    // ---- VISITOR JOURNEY ----
+    // ---- NAME PROMPT, THEN MAIN MENU ----
+    function askName() {
+      setAvatar('Aby - Hello.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>And to whom do I have the pleasure of speaking?</p>
+        <input type="text" id="mainNameInput" placeholder="Enter your name">
+        <button onclick="submitMainName()">Submit</button>`;
+    }
 
-    // Welcome
+    function submitMainName() {
+      const name = document.getElementById('mainNameInput').value.trim();
+      if (!name) return alert("Please enter your name.");
+      userName = name;
+      visitor.first_name = name; // If user selects visitor flow, we'll use this
+      mainMenu();
+    }
+
+    function mainMenu() {
+      setAvatar('Aby - Hello.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Welcome, <strong>${userName}</strong>! What brings you by today?</p>
+        <button class="choice-btn" onclick="visitorWelcome()">I am a Visitor</button>
+        <button class="choice-btn" onclick="memberIntro()">I am a Member</button>
+        <button class="choice-btn" onclick="redirect('event')">I am Registering for an Event</button>
+      `;
+    }
+
+    // ======================
+    // == VISITOR JOURNEY ===
+    // ======================
+
+    // 1. Welcome (skip name - already got it)
     function visitorWelcome() {
       setAvatar('Aby - Hello.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <p>Welcome to The Ab! We're so glad you're here.</p>
-        <p>What's your first name?</p>
-        <input type="text" id="visitorFirstName" placeholder="First name">
-        <button onclick="visitorFirstNameSubmit()">Continue</button>
+        <p>Welcome to The Ab! We're so glad you're here, ${visitor.first_name}.</p>
+        <button onclick="visitorType()">Continue</button>
       `;
     }
 
-    function visitorFirstNameSubmit() {
-      const name = document.getElementById('visitorFirstName').value.trim();
-      visitor.first_name = name;
-      if (!name) return alert("Please enter your first name.");
-      visitorType();
-    }
-
-    // New or Repeat
+    // 2. New or Repeat
     function visitorType() {
       setAvatar('Aby - Excited.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <p>Hi, <strong>${visitor.first_name}</strong>! Is this your first time visiting The Ab, or are you a returning guest?</p>
+        <p>Is this your first time visiting The Ab, or are you a returning guest?</p>
         <button class="choice-btn" onclick="visitorTypeSelect('New')">First time visitor</button>
         <button class="choice-btn" onclick="visitorTypeSelect('Repeat')">I've visited before</button>
       `;
@@ -176,7 +201,7 @@
       }
     }
 
-    // Invited or came alone
+    // 3. Invited or came alone
     function visitorInvited() {
       setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
@@ -208,7 +233,7 @@
       `;
     }
 
-    // Ask for full name (frame shows previous name)
+    // 4. Ask for full name (frame shows previous name)
     function visitorRepeatName() {
       setAvatar('Aby - Hello.png');
       const chat = document.getElementById('chat-area');
@@ -225,7 +250,7 @@
       visitorPhone();
     }
 
-    // Phone and Home/Cell
+    // 5. Phone and Home/Cell
     function visitorPhone() {
       setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
@@ -268,7 +293,7 @@
       visitorEmail();
     }
 
-    // Email and Mailing Address
+    // 6. Email and Mailing Address
     function visitorEmail() {
       setAvatar('Aby - Listening.png');
       const chat = document.getElementById('chat-area');
@@ -299,7 +324,7 @@
       visitorChurchHome();
     }
 
-    // Church home
+    // 7. Church home
     function visitorChurchHome() {
       setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
@@ -374,7 +399,6 @@
 
     // ---- FAITH CONVERSATION ----
 
-    // Know Jesus?
     function visitorFaithJourney() {
       setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
@@ -422,7 +446,7 @@
       setAvatar('Aby - Question.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
-        <img src="ABC – Salvation.png" class="frame-image" alt="ABC of Salvation">
+        <img src="ABC - Salvation.png" class="frame-image" alt="ABC of Salvation">
         <button onclick="visitorReadyToAccept()">Continue</button>
       `;
     }
@@ -438,8 +462,7 @@
     }
 
     function visitorPrayerOfSalvation() {
-      setAvatar('Aby - Praying.png');
-      const chat = document.getElementById('chat-area');
+     const chat = document.getElementById('chat-area');
       chat.innerHTML = `
         <img src="Prayer of Salvation.png" class="frame-image" alt="Prayer of Salvation">
         <button onclick="visitorCongratulations()">Continue</button>
@@ -488,6 +511,75 @@
         <button class="end-btn" onclick="window.location.href='https://abyssinia.org/theab/prayer-request/'">Request Prayer</button>
       `;
     }
+
+    // ======================
+    // == MEMBER JOURNEY ====
+    // ======================
+
+    // 1. Thank by name (enters directly after menu select)
+    function memberIntro() {
+      setAvatar('Aby - Excited.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `<p>Thank you, <strong>${userName}</strong>, for being a vital part of The Abyssinia Church Family.</p>
+        <button onclick="memberReason()">Continue</button>`;
+    }
+
+    // 2. Ask purpose w/ avatar
+    function memberReason() {
+      setAvatar('Aby - Question.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>So, <strong>${userName}</strong>, how can I help you today?</p>
+        <button class="choice-btn" onclick="memberHelp('ride')">I need to schedule a ride</button>
+        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/join-a-ministry/', '_blank')">How can I join a Ministry?</button>
+        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/prayer-request/', '_blank')">I'm in need of Prayer</button>
+        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/counseling-request/', '_blank')">I'm in need of Counseling</button>
+        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/online-giving/', '_blank')">I want to give online</button>
+      `;
+    }
+
+    // Member Branching and looping
+    function memberHelp(option) {
+      let response = '';
+      setAvatar('Aby - Serious.png');
+      if (option === 'ride') {
+        response = `If you need transportation to any of our regularly scheduled services, please call the church at: <a href="tel:9046961770">(904) 696-1770</a> and leave a message for the transportation ministry. We’ll be happy to pick you up and take you home safely!`;
+        showAnythingElse(response);
+      }
+      // All other options are now handled by direct redirect in memberReason()
+    }
+
+    // "Is there anything else?" frame and logic
+    function showAnythingElse(prevResponse) {
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>${prevResponse}</p>
+        <p>Is there anything else I can help you with?</p>
+        <button class="choice-btn" onclick="memberReason()">Yes</button>
+        <button class="choice-btn" onclick="goodbyeMember()">No</button>
+      `;
+    }
+
+    // Goodbye frame with "End" button to website
+    function goodbyeMember() {
+      setAvatar('Aby - Goodbye.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Come see me again soon! Have a great day!</p>
+        <button class="end-btn" onclick="window.location.href='https://abyssinia.org/theab/'">End</button>
+      `;
+    }
+
+    // ======================
+    // == EVENT FLOW ========
+    // ======================
+    function redirect(choice) {
+      const urls = {
+        event: 'https://www.eventbrite.com/e/the-big-catch-baptism-family-friends-and-community-day-tickets-1422315657419?aff=ebdssbdestsearch'
+      };
+      window.location.href = urls[choice];
+    }
+
   </script>
 </body>
 </html>
