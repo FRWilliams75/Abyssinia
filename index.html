@@ -20,8 +20,8 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .avatar {
-      width: 600px;
-      height: 600px;
+      width: 500px;
+      height: 500px;
       border-radius: 50%;
       background-image: url('Aby Senna.png');
       background-size: cover;
@@ -51,7 +51,23 @@
     .choice-btn:hover {
       background-color: #0056b3;
     }
-    @media (max-width: 650px) {
+    .end-btn {
+      width: 40%;
+      margin: 25px auto 0 auto;
+      display: block;
+      font-weight: bold;
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 15px;
+    }
+    .end-btn:hover {
+      background-color: #222;
+    }
+    @media (max-width: 550px) {
       .avatar {
         width: 90vw;
         height: 90vw;
@@ -61,6 +77,10 @@
       .chatbox {
         max-width: 98vw;
         padding: 3vw;
+      }
+      .end-btn {
+        width: 90vw;
+        font-size: 16px;
       }
     }
   </style>
@@ -273,12 +293,13 @@
       `;
     }
 
-    // Goodbye frame
+    // Goodbye frame with "End" button to website
     function goodbyeMember() {
       setAvatar('Aby - Goodbye.png');
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `
         <p>Come see me again soon! Have a great day!</p>
+        <button class="end-btn" onclick="window.location.href='https://abyssinia.org/theab/'">End</button>
       `;
     }
 
