@@ -12,7 +12,7 @@
       text-align: center;
     }
     .chatbox {
-      max-width: 500px;
+      max-width: 700px;
       margin: 0 auto;
       background: #fff;
       padding: 20px;
@@ -20,13 +20,13 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     .avatar {
-      width: 120px;
-      height: 120px;
+      width: 600px;
+      height: 600px;
       border-radius: 50%;
       background-image: url('Aby Senna.png');
       background-size: cover;
       background-position: center;
-      margin: 0 auto 10px;
+      margin: 0 auto 35px;
     }
     .chat {
       margin: 15px 0;
@@ -50,6 +50,18 @@
     }
     .choice-btn:hover {
       background-color: #0056b3;
+    }
+    @media (max-width: 650px) {
+      .avatar {
+        width: 90vw;
+        height: 90vw;
+        max-width: 95vw;
+        max-height: 95vw;
+      }
+      .chatbox {
+        max-width: 98vw;
+        padding: 3vw;
+      }
     }
   </style>
 </head>
@@ -97,11 +109,11 @@
       const chat = document.getElementById('chat-area');
       chat.innerHTML = `<p>Tell me, ${userName}, what brings you by today?</p>
         <button class="choice-btn" onclick="visitorIntro()">I am a Visitor</button>
-        <button class="choice-btn" onclick="memberNameFrame()">I am a Member</button>
+        <button class="choice-btn" onclick="memberIntro()">I am a Member</button>
         <button class="choice-btn" onclick="redirect('event')">I am Registering for an Event</button>`;
     }
 
-    // VISITOR FLOW (unchanged from your version)
+    // VISITOR FLOW (unchanged)
     function visitorIntro() {
       setAvatar('Aby - Excited.png');
       const chat = document.getElementById('chat-area');
@@ -217,22 +229,7 @@
 
     // ============ MEMBER FLOW ============
 
-    // Member Flow Frame 1: Ask member's name
-    function memberNameFrame() {
-      setAvatar('Aby - Hello.png');
-      const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>What’s your name?</p>
-        <input type="text" id="memberNameInput" placeholder="Enter your name">
-        <button onclick="submitMemberName()">Submit</button>`;
-    }
-
-    function submitMemberName() {
-      userName = document.getElementById('memberNameInput').value.trim();
-      if (!userName) return alert("Please enter your name.");
-      memberIntro();
-    }
-
-    // Member Flow Frame 2: Thank by name
+    // Member Flow Frame 2: Thank by name (enters directly after purpose select)
     function memberIntro() {
       setAvatar('Aby - Excited.png');
       const chat = document.getElementById('chat-area');
@@ -247,24 +244,42 @@
       chat.innerHTML = `
         <p>So, <strong>${userName}</strong>, how can I help you today?</p>
         <button class="choice-btn" onclick="memberHelp('ride')">I need to schedule a ride</button>
-        <button class="choice-btn" onclick="memberHelp('ministry')">How can I join a Ministry?</button>
+        <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/join-a-ministry/', '_blank')">How can I join a Ministry?</button>
         <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/prayer-request/', '_blank')">I'm in need of Prayer</button>
         <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/counseling-request/', '_blank')">I'm in need of Counseling</button>
         <button class="choice-btn" onclick="window.open('https://abyssinia.org/theab/online-giving/', '_blank')">I want to give online</button>
       `;
     }
 
-    // Member Branching
+    // Member Branching and looping
     function memberHelp(option) {
       let response = '';
       setAvatar('Aby - Serious.png');
       if (option === 'ride') {
         response = `If you need transportation to any of our regularly scheduled services, please call the church at: <a href="tel:9046961770">(904) 696-1770</a> and leave a message for the transportation ministry. We’ll be happy to pick you up and take you home safely!`;
-      } else if (option === 'ministry') {
-        response = `I haven't finished compiling a complete list of the ministry contacts just yet, but stop by the Welcome Center on Sunday and let them know which ministry you are interested in. Someone at the Welcome Center will point you in the right direction. If you can't wait until Sunday, just call the church at <a href="tel:9046961770">(904) 696-1770</a> and ask for Sis. Elsie Allen. She’ll get you connected right away!`;
+        showAnythingElse(response);
       }
+      // All other options are now handled by direct redirect in memberReason()
+    }
+
+    // "Is there anything else?" frame and logic
+    function showAnythingElse(prevResponse) {
       const chat = document.getElementById('chat-area');
-      chat.innerHTML = `<p>${response}</p>`;
+      chat.innerHTML = `
+        <p>${prevResponse}</p>
+        <p>Is there anything else I can help you with?</p>
+        <button class="choice-btn" onclick="memberReason()">Yes</button>
+        <button class="choice-btn" onclick="goodbyeMember()">No</button>
+      `;
+    }
+
+    // Goodbye frame
+    function goodbyeMember() {
+      setAvatar('Aby - Goodbye.png');
+      const chat = document.getElementById('chat-area');
+      chat.innerHTML = `
+        <p>Come see me again soon! Have a great day!</p>
+      `;
     }
 
     // EVENT redirect (from main menu)
